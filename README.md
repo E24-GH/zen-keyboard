@@ -12,9 +12,11 @@ Configuratorは、ZENをUSBでつないでブラウザから設定する画面�
 
 GitHubの操作は必要ありません。
 
-1. Releases から ZIP をダウンロードします
+1. [セットアップガイド](https://e24-gh.github.io/zen/firmware.html) から ZIP をダウンロードします
 2. 右手と左手の対応コントローラへUF2ファイルを書き込みます
 3. 右手をUSBでつなぎ、Configuratorを開いて設定します
+
+書き込むファイルの選び方や、うまくいかないときの手順もガイドにまとめています。
 
 ### 応用: forkして、コンボやマクロも編集する
 
@@ -35,7 +37,7 @@ GitHubの操作は必要ありません。
 
 ## 書き込むファイル
 
-ZIPおよびGitHub Actionsで作成される `firmware` には、以下のUF2ファイルが含まれます。
+ZIP および GitHub Actions で作成される `firmware` には、以下のUF2ファイルが含まれます。
 
 - 設定リセット用UF2ファイル
 - `zen_right_trackball_pmw3610_central.uf2`
