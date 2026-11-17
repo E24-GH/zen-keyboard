@@ -1,0 +1,198 @@
+# Sensor data simulator
+#
+# Copyright (c) 2019 Nordic Semiconductor
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+menuconfig PMW3610_ALT
+  bool "PMW3610 mouse optical sensor"
+  select SPI
+  depends on INPUT
+  depends on DT_HAS_PIXART_PMW3610_ALT_ENABLED
+  help
+      Enable PMW3610 mouse optical sensor.
+
+if PMW3610_ALT
+
+config INPUT_PMW3610_INIT_PRIORITY
+    int "PMW3610 initialization priority"
+    default INPUT_INIT_PRIORITY
+
+config PMW3610_ALT_SWAP_XY
+  bool "Swap the X/Y axis of PMW3610 sensor"
+
+config PMW3610_ALT_INVERT_X
+  bool "Invert the X axis of PMW3610 sensor"
+
+config PMW3610_ALT_INVERT_Y
+  bool "Invert the Y axis of PMW3610 sensor"
+
+config PMW3610_ALT_INIT_POWER_UP_EXTRA_DELAY_MS
+  int "Extra power up init delay (ms)"
+  default 0
+  help
+    Default minimum init power up delay is 10ms.
+    Use this config to postpone init power up sequence if needs longer bootup time.
+
+config PMW3610_ALT_INIT_RETRY_DELAY_MS
+  int "PMW3610 init retry delay (ms)"
+  default 1000
+  help
+    Delay before restarting the PMW3610 async init sequence after an init failure.
+
+config PMW3610_ALT_INIT_RETRY_MAX_ATTEMPTS
+  int "PMW3610 init retry max attempts"
+  default 0
+  help
+    Maximum number of full init attempts after failures. 0 means retry indefinitely.
+
+config PMW3610_ALT_REPORT_INTERVAL_MIN
+	int "PMW3610's default minimum report rate"
+	default 0
+	help
+	  Default minimum report interval in milliseconds.
+		Slow down input reporting for hid queue over the air.
+		Turn value down to 8ms to get sharp response if use with USB only.
+
+config PMW3610_ALT_SMART_ALGORITHM
+  bool "Enable an algorithm of PMW3610 to enhance surface coverage"
+  default y
+  help
+    Enable the integration of the smart algorithm as the datasheet implementation.
+    The algorithm is used to extend the tracking acrocss a wider range of surfaces
+    such as graniles and tiles.
+
+config PMW3610_ALT_RUN_DOWNSHIFT_TIME_MS
+    int "PMW3610's default RUN mode downshift time"
+    default 128
+    range 13 3264
+    help
+      Default RUN mode downshift down time in milliseconds.
+      Time after which sensor goes from RUN to REST1 mode.
+
+config PMW3610_ALT_REST1_DOWNSHIFT_TIME_MS
+    int "PMW3610's default REST1 mode downshift time"
+    default 5000
+    help
+      Default REST1 mode downshift down time in milliseconds.
+      Time after which sensor goes from REST1 to REST2 mode.
+
+config PMW3610_ALT_REST2_DOWNSHIFT_TIME_MS
+    int "PMW3610's default REST2 mode downshift time"
+    default 17000
+    help
+      Default REST2 mode downshift down time in milliseconds.
+      Time after which sensor goes from REST2 to REST3 mode.
+
+config PMW3610_ALT_REST1_SAMPLE_TIME_MS
+    int "PMW3610's sample time in REST1 stage"
+    default 40
+    # range 10 2550
+    help
+      Default REST1 mode sample period in millisecond
+
+config PMW3610_ALT_REST2_SAMPLE_TIME_MS
+    int "PMW3610's sample time in REST2 stage"
+    default 100
+    # range 10 2550
+    help
+      Default REST2 mode sample period in millisecond.
+
+config PMW3610_ALT_REST3_SAMPLE_TIME_MS
+    int "PMW3610's sample time in REST3 stage"
+    default 500
+    # range 10 2550
+    help
+      Default REST2 mode sample period in millisecond.
+
+module = PMW3610_ALT
+module-str = PMW3610_ALT
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+endif #PMW3610_ALT
+
+menuconfig IQS7211E
+    bool "IQS7211E capcacitive touch sensor"
+    select I2C
+    help
+      Enable IQS7211E capcacitive touch sensor.
+
+if IQS7211E
+
+config IQS7211E_TAP_EDGE_MARGIN_PERMILLE
+    int "Tap ignore edge margin (permille)"
+    range 0 450
+    default 80
+    help
+      Edge margin used to suppress tap/click detection in scroller mode.
+      80 means 8 percent margin from each edge.
+
+config IQS7211E_SCROLLER_HWHEEL_ZONE_MIN_PERMILLE
+    int "HWheel zone start (permille)"
+    range 0 1000
+    default 0
+    help
+      Start position of the horizontal scroll zone in permille of Y size.
+      This value and MAX define a band [MIN, MAX).
+
+config IQS7211E_SCROLLER_HWHEEL_ZONE_MAX_PERMILLE
+    int "HWheel zone end (permille)"
+    range 0 1000
+    default 150
+    help
+      End position of the horizontal scroll zone in permille of Y size.
+      This value and MIN define a band [MIN, MAX).
+
+config IQS7211E_TWO_FINGER_SCROLL_DIVIDER
+    int "Two-finger scroll delta divider"
+    range 1 64
+    default 8
+    help
+      Scales down the default two-finger scroll path without affecting
+      one-finger pointer movement. Higher values make scroll slower.
+
+config IQS7211E_TAP_SUPPRESS_DISTANCE
+    int "Tap suppress distance after scroll gesture"
+    range 1 512
+    default 24
+    help
+      Raw two-finger movement distance required before tap recognition is
+      suppressed until all fingers are released. Higher values make tap
+      recognition more permissive during small scroll gestures.
+
+config IQS7211E_TWO_FINGER_SCROLL_JUMP_THRESHOLD
+    int "Two-finger scroll jump threshold"
+    range 1 2048
+    default 180
+    help
+      Ignore a two-finger scroll sample when either axis delta exceeds this
+      raw threshold. This helps suppress release-time coordinate jumps that
+      can produce one large unintended scroll event.
+
+config IQS7211E_SCROLLER_INERTIA
+    bool "Enable inertia scrolling in scroller mode"
+    default n
+    help
+      Keep sending wheel events after finger release when the device is in
+      scroller mode. Uses fixed-point integer math (no FPU required).
+
+config IQS7211E_SCROLLER_INERTIA_DECAY_PERMILLE
+    int "Inertia decay coefficient (permille)"
+    range 1 999
+    default 920
+    depends on IQS7211E_SCROLLER_INERTIA
+    help
+      Velocity multiplier applied every 10ms tick.
+      920 means velocity = velocity * 0.92 per tick.
+
+config IQS7211E_SCROLLER_INERTIA_STOP_THRESHOLD_Q8
+    int "Inertia stop threshold (Q8 wheel units per 10ms)"
+    range 1 4096
+    default 96
+    depends on IQS7211E_SCROLLER_INERTIA
+    help
+      Inertia stops immediately when absolute velocity goes below this value.
+      Q8 means 256 equals 1 wheel unit per 10ms.
+
+endif
