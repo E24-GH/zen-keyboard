@@ -13,13 +13,9 @@ if(CONFIG_SHIELD_ZEN_LEFT OR CONFIG_SHIELD_ZEN_RIGHT)
   # locked and there's no watchdog, so a faulting half stays dead until someone
   # cycles its power switch. See the comment at the top of the file.
   zephyr_library_sources(src/zen_fault_recovery.c)
-  # Only where ZMK actually owns the USB stack. On a split peripheral
-  # CONFIG_ZMK_USB is off (zmk/app/CMakeLists.txt builds the USB/HID/endpoint
-  # layer for central + standalone only), so the CDC-ACM port the bridge polls
-  # exists but nothing in ZMK enables or manages it -- and polling it there
-  # stops the peripheral coming back from deep sleep. See the comment at the
-  # top of src/zen_config_serial_bridge.c.
-  zephyr_library_sources_ifdef(CONFIG_ZMK_USB src/zen_config_serial_bridge.c)
+  # See Kconfig: central-or-standalone only, and never alongside ZMK Studio,
+  # which listens on the same UART.
+  zephyr_library_sources_ifdef(CONFIG_ZEN_CONFIG_BRIDGE src/zen_config_serial_bridge.c)
   zephyr_library_sources_ifdef(CONFIG_PMW3610_ALT drivers/pmw3610_alt/src/pmw3610.c)
   zephyr_library_sources_ifdef(CONFIG_IQS7211E drivers/iqs7211e/src/iqs7211e.c drivers/iqs7211e/src/iqs7211e_reg.c)
 endif()

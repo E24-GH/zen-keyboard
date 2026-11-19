@@ -196,3 +196,23 @@ config IQS7211E_SCROLLER_INERTIA_STOP_THRESHOLD_Q8
       Q8 means 256 equals 1 wheel unit per 10ms.
 
 endif
+
+config ZEN_CONFIG_BRIDGE
+    bool "ZEN Configurator serial bridge"
+    default y
+    depends on ZMK_USB
+    depends on !ZMK_STUDIO
+    help
+      The USB serial endpoint the ZEN Configurator talks to: pointer
+      settings, the keymap, status and Bluetooth profiles.
+
+      It cannot run alongside ZMK Studio. Both listen on the UART that
+      `zmk,studio-rpc-uart` names, and two threads polling the same port
+      take each other's bytes, so neither answers reliably. That is why
+      this depends on !ZMK_STUDIO rather than merely warning about it:
+      turning Studio on in a shield .conf is enough to turn the bridge
+      off, and the build is coherent either way.
+
+      Only where ZMK owns the USB stack. On a split peripheral
+      CONFIG_ZMK_USB is off, the CDC-ACM port exists but nothing manages
+      it, and polling it there stops the half waking from deep sleep.
